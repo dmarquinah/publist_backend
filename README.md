@@ -1,7 +1,10 @@
 # Public Music Playlist Viewer API
+
 ## Overview
+
 The Public Music Playlist Viewer API is a real-time backend service designed for public spaces like cafes, restaurants, or retail stores. It provides a robust API for managing and broadcasting music playlist information, enabling client applications to display currently playing songs and upcoming tracks in real-time.
-Features
+
+## Features
 
 - Real-time playlist state management
 - WebSocket support for live updates
@@ -16,10 +19,9 @@ Features
 ## Technical Stack
 
 - Go 1.22
-- Standard library WebSocket implementation
+- Standard library SSE implementation
 - SQL database for persistent storage
 - Redis for caching (optional)
-- Music service integration support
 - In-memory state management
 
 ## System Requirements
@@ -30,6 +32,7 @@ Features
 - Redis 6+ (optional)
 
 ## Architecture
+
 The system implements a publisher-subscriber pattern:
 
 - Music source updates are received via SSE
@@ -48,7 +51,7 @@ The system implements a publisher-subscriber pattern:
 
 - GET `/playlist/current` - Get current track
 - GET `/playlist/queue` - Get upcoming tracks
-- WS `/ws/playlist` - Real-time updates
+- GET `/sse/playlist` - Real-time updates
 
 
 ### Admin Operations:
@@ -62,8 +65,6 @@ The system implements a publisher-subscriber pattern:
 
 - GET `/health` - System health check
 - GET `/metrics` - System metrics (protected)
-
-
 
 ## Setup Instructions
 
