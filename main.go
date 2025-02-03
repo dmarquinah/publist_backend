@@ -11,6 +11,7 @@ import (
 
 	"github.com/dmarquinah/publist_backend/internal/config"
 	"github.com/dmarquinah/publist_backend/internal/handler"
+	"github.com/dmarquinah/publist_backend/internal/middleware"
 	"github.com/dmarquinah/publist_backend/internal/repository"
 	"github.com/dmarquinah/publist_backend/internal/service"
 )
@@ -27,13 +28,32 @@ func main() {
 	// Setup router
 	mux := http.NewServeMux()
 
+	// API v1 routes
+	apiV1 := http.NewServeMux()
+
 	// Register routes
-	handlers.RegisterRoutes(mux)
+	handlers.RegisterRoutes(apiV1)
+
+	// Mount API v1 routes under /api/v1
+	mux.Handle("/api/v1/", http.StripPrefix("/api/v1", apiV1))
+
+	// Health check endpoint (outside API version)
+	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("OK"))
+	})
+
+	// Apply global middleware
+	handler := middleware.Logger(
+		middleware.Recoverer(
+			middleware.CORS(mux),
+		),
+	)
 
 	// Configure server
 	server := &http.Server{
 		Addr:         cfg.ServerAddress,
-		Handler:      mux,
+		Handler:      handler,
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 15 * time.Second,
 		IdleTimeout:  60 * time.Second,

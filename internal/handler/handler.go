@@ -19,8 +19,8 @@ func NewHandler(svc service.Service) *Handler {
 }
 
 func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("POST /api/items", h.CreateItem)
-	mux.HandleFunc("GET /api/items/{id}", h.GetItem)
+	mux.HandleFunc("POST /items", h.CreateItem)
+	mux.HandleFunc("GET /items/{id}", h.GetItem)
 }
 
 func (h *Handler) CreateItem(w http.ResponseWriter, r *http.Request) {
