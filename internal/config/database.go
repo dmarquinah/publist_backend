@@ -4,6 +4,10 @@ import (
 	"database/sql"
 	"fmt"
 	"time"
+
+	_ "database/sql/driver"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 const DB_HOST_KEY = "DB_HOST"

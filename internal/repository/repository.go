@@ -1,45 +1,32 @@
 package repository
 
 import (
-	"context"
+	"database/sql"
 	"sync"
 
-	"github.com/dmarquinah/publist_backend/internal/errors"
 	"github.com/dmarquinah/publist_backend/internal/model"
 )
 
 type Repository interface {
-	CreateItem(ctx context.Context, item *model.Item) error
-	GetItem(ctx context.Context, id string) (*model.Item, error)
-	// Add more repository methods as needed
+	GetPlaylistRepository() PlaylistRepository
+	PlaylistRepository
+}
+
+func NewRepository(db *sql.DB) Repository {
+	playlistRepository := NewPlaylistRepository(db)
+	return &repository{
+		items:              make(map[string]*model.Item),
+		PlaylistRepository: playlistRepository,
+		mu:                 &sync.RWMutex{},
+	}
 }
 
 type repository struct {
 	items map[string]*model.Item
-	mu    sync.RWMutex
+	mu    *sync.RWMutex
+	PlaylistRepository
 }
 
-func NewRepository() Repository {
-	return &repository{
-		items: make(map[string]*model.Item),
-	}
-}
-
-func (r *repository) CreateItem(ctx context.Context, item *model.Item) error {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-
-	r.items[item.ID] = item
-	return nil
-}
-
-func (r *repository) GetItem(ctx context.Context, id string) (*model.Item, error) {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-
-	item, exists := r.items[id]
-	if !exists {
-		return nil, errors.ErrItemNotFound
-	}
-	return item, nil
+func (r *repository) GetPlaylistRepository() PlaylistRepository {
+	return r.PlaylistRepository
 }

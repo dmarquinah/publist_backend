@@ -1,34 +1,23 @@
 package service
 
 import (
-	"context"
-
-	"github.com/dmarquinah/publist_backend/internal/model"
 	"github.com/dmarquinah/publist_backend/internal/repository"
 )
 
 type Service interface {
-	CreateItem(ctx context.Context, item *model.Item) error
-	GetItem(ctx context.Context, id string) (*model.Item, error)
 	// Add more service methods as needed
+	PlaylistService
 }
 
 type service struct {
-	repo repository.Repository
+	repo            repository.Repository
+	PlaylistService // Add PlaylistService field
 }
 
 func NewService(repo repository.Repository) Service {
+	playlistService := NewPlaylistService(repo.GetPlaylistRepository())
 	return &service{
-		repo: repo,
+		repo:            repo,
+		PlaylistService: playlistService, // Initialize PlaylistService
 	}
-}
-
-func (s *service) CreateItem(ctx context.Context, item *model.Item) error {
-	// Add business logic here
-	return s.repo.CreateItem(ctx, item)
-}
-
-func (s *service) GetItem(ctx context.Context, id string) (*model.Item, error) {
-	// Add business logic here
-	return s.repo.GetItem(ctx, id)
 }

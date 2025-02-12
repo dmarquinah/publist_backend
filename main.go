@@ -20,8 +20,16 @@ func main() {
 	// Load configuration
 	cfg := config.New()
 
+	// Initialize database
+	dbConfig := config.NewDBConfig()
+	db, err := config.NewDB(dbConfig)
+	if err != nil {
+		log.Fatalf("Failed to initialize database: %v", err)
+	}
+	defer db.Close()
+
 	// Initialize dependencies
-	repo := repository.NewRepository()
+	repo := repository.NewRepository(db)
 	svc := service.NewService(repo)
 	handlers := handler.NewHandler(svc)
 
