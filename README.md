@@ -89,6 +89,12 @@ The system implements a publisher-subscriber pattern:
 - Start the service
 - Monitor system health
 
+## Docker Deployment
+
+- Ensure you have Docker installed.
+- Build the Docker image: `docker build -t publist_backend .`
+- Run the Docker container: `docker run -p 5000:5000 publist_backend`
+
 ## Security Considerations
 
 - JWT-based authentication
