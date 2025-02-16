@@ -16,11 +16,11 @@ type PlaylistService interface {
 	GetPlaylist(ctx context.Context, id string) (*model.Playlist, error)
 	UpdatePlaylist(ctx context.Context, playlist *model.Playlist) error
 	DeletePlaylist(ctx context.Context, id string, userID string, isAdmin bool) error
-	AddTrack(ctx context.Context, track *model.Track, userID string) error
+	AddTrack(ctx context.Context, track *model.Playlist_Track, userID string) error
 	RemoveTrack(ctx context.Context, playlistID, trackID string, userID string) error
 	ReorderTrack(ctx context.Context, playlistID, trackID string, newPosition int, userID string) error
-	GetCurrentTrack(ctx context.Context, playlistID string) (*model.Track, error)
-	GetPlaylistTracks(ctx context.Context, playlistID string) ([]*model.Track, error)
+	GetCurrentTrack(ctx context.Context, playlistID string) (*model.Playlist_Track, error)
+	GetPlaylistTracks(ctx context.Context, playlistID string) ([]*model.Playlist_Track, error)
 	ModeratePlaylist(ctx context.Context, playlistID string, isModerated bool) error
 	GetPlaylistsByHost(ctx context.Context, hostID string) ([]*model.Playlist, error)
 }
@@ -102,7 +102,7 @@ func (s *playlistService) GetPlaylistsByHost(ctx context.Context, hostID string)
 	return playlists, nil
 }
 
-func (s *playlistService) AddTrack(ctx context.Context, track *model.Track, userID string) error {
+func (s *playlistService) AddTrack(ctx context.Context, track *model.Playlist_Track, userID string) error {
 	playlist, err := s.repo.GetPlaylist(ctx, track.PlaylistID)
 	if err != nil {
 		if errors.Is(err, errorsmsg.ErrPlaylistNotFound) {
@@ -175,7 +175,7 @@ func (s *playlistService) ReorderTrack(ctx context.Context, playlistID, trackID 
 	return s.repo.UpdateTrackPosition(ctx, playlistID, trackID, newPosition)
 }
 
-func (s *playlistService) GetCurrentTrack(ctx context.Context, playlistID string) (*model.Track, error) {
+func (s *playlistService) GetCurrentTrack(ctx context.Context, playlistID string) (*model.Playlist_Track, error) {
 	track, err := s.repo.GetCurrentTrack(ctx, playlistID)
 	if err != nil {
 		return nil, fmt.Errorf("fetching current track: %w", err)
@@ -183,7 +183,7 @@ func (s *playlistService) GetCurrentTrack(ctx context.Context, playlistID string
 	return track, nil
 }
 
-func (s *playlistService) GetPlaylistTracks(ctx context.Context, playlistID string) ([]*model.Track, error) {
+func (s *playlistService) GetPlaylistTracks(ctx context.Context, playlistID string) ([]*model.Playlist_Track, error) {
 	tracks, err := s.repo.GetPlaylistTracks(ctx, playlistID)
 	if err != nil {
 		return nil, fmt.Errorf("fetching playlist tracks: %w", err)

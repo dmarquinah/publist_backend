@@ -12,6 +12,14 @@ type Playlist struct {
 }
 
 type Track struct {
+	ID       string    `json:"id"`
+	Title    string    `json:"title"`
+	Artist   string    `json:"artist"`
+	Duration int       `json:"duration"` // in seconds
+	AddedAt  time.Time `json:"added_at"`
+}
+
+type Playlist_Track struct {
 	ID         string    `json:"id"`
 	PlaylistID string    `json:"playlist_id"`
 	Title      string    `json:"title"`

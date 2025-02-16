@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 
 	"github.com/dmarquinah/publist_backend/internal/auth"
@@ -152,14 +153,14 @@ func (h *PlaylistHandler) AddTrack(w http.ResponseWriter, r *http.Request) {
 	claims := r.Context().Value("claims").(*auth.Claims)
 	playlistID := r.PathValue("id")
 
-	var track model.Track
+	var track model.Playlist_Track
 	if err := json.NewDecoder(r.Body).Decode(&track); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
 	track.ID = uuid.New().String()
-	track.PlaylistID = playlistID
+	track.ID = playlistID
 
 	if err := h.svc.AddTrack(r.Context(), &track, claims.UserID); err != nil {
 		switch {
@@ -252,6 +253,7 @@ func (h *PlaylistHandler) GetPlaylistTracks(w http.ResponseWriter, r *http.Reque
 
 	tracks, err := h.svc.GetPlaylistTracks(r.Context(), playlistID)
 	if err != nil {
+		log.Printf("error: %v", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}

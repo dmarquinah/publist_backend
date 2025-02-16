@@ -3,6 +3,7 @@ package config
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"time"
 
 	_ "database/sql/driver"
@@ -60,5 +61,6 @@ func NewDB(config *DBConfig) (*sql.DB, error) {
 	db.SetMaxIdleConns(25)
 	db.SetConnMaxLifetime(5 * time.Minute)
 
+	log.Println("Database connected successfully")
 	return db, nil
 }

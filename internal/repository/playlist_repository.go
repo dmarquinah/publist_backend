@@ -15,11 +15,11 @@ type PlaylistRepository interface {
 	UpdatePlaylist(ctx context.Context, playlist *model.Playlist) error
 	DeletePlaylist(ctx context.Context, id string) error
 	GetPlaylistsByHost(ctx context.Context, hostID string) ([]*model.Playlist, error)
-	AddTrack(ctx context.Context, track *model.Track) error
+	AddTrack(ctx context.Context, track *model.Playlist_Track) error
 	RemoveTrack(ctx context.Context, playlistID, trackID string) error
 	UpdateTrackPosition(ctx context.Context, playlistID, trackID string, newPosition int) error
-	GetCurrentTrack(ctx context.Context, playlistID string) (*model.Track, error)
-	GetPlaylistTracks(ctx context.Context, playlistID string) ([]*model.Track, error)
+	GetCurrentTrack(ctx context.Context, playlistID string) (*model.Playlist_Track, error)
+	GetPlaylistTracks(ctx context.Context, playlistID string) ([]*model.Playlist_Track, error)
 }
 
 type playlistRepository struct {
@@ -139,7 +139,7 @@ func (r *playlistRepository) GetPlaylistsByHost(ctx context.Context, hostID stri
 	return playlists, rows.Err()
 }
 
-func (r *playlistRepository) AddTrack(ctx context.Context, track *model.Track) error {
+func (r *playlistRepository) AddTrack(ctx context.Context, track *model.Playlist_Track) error {
 	query := `
 		INSERT INTO tracks (id, playlist_id, title, artist, duration, position, added_at, is_playing)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -218,14 +218,14 @@ func (r *playlistRepository) UpdateTrackPosition(ctx context.Context, playlistID
 	return tx.Commit()
 }
 
-func (r *playlistRepository) GetCurrentTrack(ctx context.Context, playlistID string) (*model.Track, error) {
+func (r *playlistRepository) GetCurrentTrack(ctx context.Context, playlistID string) (*model.Playlist_Track, error) {
 	query := `
 		SELECT id, playlist_id, title, artist, duration, position, added_at, is_playing
 		FROM tracks
 		WHERE playlist_id = ? AND is_playing = true
 		LIMIT 1
 	`
-	track := &model.Track{}
+	track := &model.Playlist_Track{}
 	err := r.db.QueryRowContext(ctx, query, playlistID).Scan(
 		&track.ID,
 		&track.PlaylistID,
@@ -242,12 +242,14 @@ func (r *playlistRepository) GetCurrentTrack(ctx context.Context, playlistID str
 	return track, err
 }
 
-func (r *playlistRepository) GetPlaylistTracks(ctx context.Context, playlistID string) ([]*model.Track, error) {
+func (r *playlistRepository) GetPlaylistTracks(ctx context.Context, playlistID string) ([]*model.Playlist_Track, error) {
 	query := `
-		SELECT id, playlist_id, title, artist, duration, position, added_at, is_playing
-		FROM tracks
+		SELECT t.id, pt.playlist_id, t.title, t.artist, t.duration, pt.position, pt.added_at, pt.is_playing
+		FROM playlist_tracks pt
+		INNER JOIN tracks t
+		ON t.id = pt.track_id 
 		WHERE playlist_id = ?
-		ORDER BY position
+		ORDER BY position;
 	`
 	rows, err := r.db.QueryContext(ctx, query, playlistID)
 	if err != nil {
@@ -255,9 +257,9 @@ func (r *playlistRepository) GetPlaylistTracks(ctx context.Context, playlistID s
 	}
 	defer rows.Close()
 
-	var tracks []*model.Track
+	var tracks []*model.Playlist_Track
 	for rows.Next() {
-		track := &model.Track{}
+		track := &model.Playlist_Track{}
 		err := rows.Scan(
 			&track.ID,
 			&track.PlaylistID,
