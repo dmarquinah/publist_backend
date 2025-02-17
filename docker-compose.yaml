@@ -1,0 +1,44 @@
+x-app-common: &app-common
+  build: .
+  environment:
+    DOCKER: "true"
+  volumes:
+    - .:/code
+  depends_on:
+    mysql:
+      condition: service_healthy
+  networks:
+    - app-network
+
+services:
+  app:
+    <<: *app-common
+    environment:
+      APP_ENV: ${APP_ENV:-dev}
+      DOCKER: "true"
+      APP_PORT: ":5000"
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-devpassword}
+      DB_HOST: ${DB_HOST:-mysql}  # Changed from localhost to mysql service name
+    ports:
+      - "5050:5000"
+
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-devpassword}  # Default value
+      MYSQL_DATABASE: ${DB_NAME:-pubplay}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-devpassword}"]
+      timeout: 5s
+      retries: 10
+
+volumes:
+  mysql_data:
+
+networks:
+  app-network:
+    driver: bridge

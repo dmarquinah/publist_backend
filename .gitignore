@@ -23,6 +23,8 @@ go.work.sum
 
 # env file
 .env
+.env.*
+!.env.example
 
 # VS Code configs
 .vscode

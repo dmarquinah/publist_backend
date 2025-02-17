@@ -95,6 +95,14 @@ The system implements a publisher-subscriber pattern:
 - Build the Docker image: `docker build -t publist_backend .`
 - Run the Docker container: `docker run -p 5000:5000 publist_backend`
 
+- Alternatively, use Docker Compose:
+  - Ensure you have Docker Compose installed.
+  - Run `docker-compose up -d` to build and start the application and database.
+
+- To use different environment variables for different environments:
+  - Create a `.env` file (e.g., `.env.dev`, `.env.prod`) with the environment variables.
+  - Run `docker-compose --env-file .env.dev up -d` to use the environment variables from the `.env.dev` file.
+
 ## Security Considerations
 
 - JWT-based authentication

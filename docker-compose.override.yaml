@@ -1,0 +1,7 @@
+services:
+  app:
+    env_file:
+      - .env.${APP_ENV:-dev}
+  mysql:
+    env_file:
+      - .env.${APP_ENV:-dev}
