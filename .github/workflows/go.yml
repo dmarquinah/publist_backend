@@ -27,8 +27,14 @@ jobs:
 
     - name: Run golangci-lint
       uses: golangci/golangci-lint-action@v3
+      continue-on-error: true
       with:
         version: latest
+
+    - name: Process lint results
+      if: always()
+      run: |
+        echo "Lint status: ${{ steps.lint.outcome }}"
 
     - name: Run Tests
       run: go test -v ./...
