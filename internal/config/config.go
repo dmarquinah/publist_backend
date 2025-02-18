@@ -15,7 +15,7 @@ type Config struct {
 func New() *Config {
 	//Handle load of environment params
 	log.Println("Reading env variables...")
-	appEnv := getEnv("APP_ENV", "dev")
+	appEnv := getEnv("APP_ENV", "local")
 
 	// Only try to load .env file if not in Docker
 	if os.Getenv("DOCKER") != "true" {
