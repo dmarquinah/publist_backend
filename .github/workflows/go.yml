@@ -2,9 +2,9 @@ name: Go CI Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
 
 jobs:
   build:
@@ -26,6 +26,7 @@ jobs:
       run: go mod verify
 
     - name: Run golangci-lint
+      id: lint
       uses: golangci/golangci-lint-action@v3
       continue-on-error: true
       with:
