@@ -18,9 +18,6 @@ jobs:
       with:
         go-version: '1.22'
         cache: true
-    
-    - name: Install dependencies
-      run: go mod download
 
     - name: Verify dependencies
       run: go mod verify
@@ -30,9 +27,6 @@ jobs:
       env:
         DB_HOST: localhost
         DB_NAME: pubplay
-
-    - name: Build
-      run: go build -v ./...
 
     - name: Build Docker image
       run: docker build -t publist-backend .
